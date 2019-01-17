@@ -3,6 +3,7 @@ Created on Jan 17, 2019
 
 @author: Grant Zheng
 '''
+import matplotlib.pyplot as plt
 
 def readText(fileName):
     currFile = open(fileName, 'r')
@@ -24,6 +25,17 @@ def readText(fileName):
     
     return toReturn
 
-
+def plotData(data):
+    
+    l = len(data)
+    
+    for i in range(l):
+        if (data[i][0] == 1):
+            toPlotData = data[i][1:5]
+            plt.plot(toPlotData)
+            print(toPlotData)
+        
+    plt.show()
 if __name__ == '__main__':
-    print(readText("2d-shape-1.txt")[0])
+    textData = readText("2d-shape-1.txt")
+    plotData(textData[0:2])
