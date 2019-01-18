@@ -43,14 +43,27 @@ def patternPlot(lineSegment):
         elif patternType == 3:
             width = lineSegment[6]
             pitch = lineSegment[7]
-            dir = [xPos[1] - xPos[0], yPos[1] - yPos[0]]
-            dirUnit = dir / np.linalg.norm(dir)
-            itr = np.linalg.norm(dir) / pitch
+            direction = [xPos[1] - xPos[0], yPos[1] - yPos[0]]
+            unitDir = direction / np.linalg.norm(direction)
+            orthUnitDir = [-unitDir[1], unitDir[0]]
+            itr = np.linalg.norm(direction) / pitch
             itr = math.floor(itr)
-            
+            increment = pitch / 1.0 / 4.0
+            startPos = [xPos[0], yPos[0]]
+
             for i in range (itr):
-                print("new Pattern")
-            print(dir)
+                currSeg = i * pitch * unitDir + startPos
+                currLoc = currSeg
+                for j in range(4):
+                    nextLoc = np.add(np.multiply(increment, unitDir), np.multiply(math.pow(-1, j) * (width / 2), orthUnitDir))
+                    nextLoc = np.add(currLoc, nextLoc)
+                    toPlotX = [currLoc[0], nextLoc[0]]
+                    toPlotY = [currLoc[1], nextLoc[1]]
+                    currLoc = nextLoc
+                    plt.plot(toPlotX, toPlotY, 'k-')
+                     
+                #print("new Pattern")
+            print(direction)
         
     elif lineType == 2:
         patternType = lineSegment[6]
