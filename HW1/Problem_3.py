@@ -25,17 +25,29 @@ def readText(fileName):
     
     return toReturn
 
+def patternPlot():
+    return
+    
 def plotData(data):
     
     l = len(data)
     
     for i in range(l):
-        if (data[i][0] == 1):
-            toPlotData = data[i][1:5]
-            plt.plot(toPlotData)
-            print(toPlotData)
-        
+        currData = data[i]
+        lineType = currData[0]
+        linePattern = currData[6]
+        if (lineType == 1):
+            currDataX = [currData[1], currData[3]]
+            currDataY = [currData[2], currData[4]]
+            if (linePattern == 1):
+                plt.plot(currDataX, currDataY, 'k-')
+            elif(linePattern == 3):
+                return
+                
+        elif(currData[0] == 2):
+            center = [currData[1],currData[2]]
+               
     plt.show()
 if __name__ == '__main__':
     textData = readText("2d-shape-1.txt")
-    plotData(textData[0:2])
+    plotData(textData)
