@@ -44,26 +44,41 @@ def patternPlot(lineSegment):
             width = lineSegment[6]
             pitch = lineSegment[7]
             direction = [xPos[1] - xPos[0], yPos[1] - yPos[0]]
-            unitDir = direction / np.linalg.norm(direction)
+            length = np.linalg.norm(direction)
+            unitDir = direction / length
             orthUnitDir = [-unitDir[1], unitDir[0]]
-            itr = np.linalg.norm(direction) / pitch
-            itr = math.floor(itr)
-            increment = pitch / 1.0 / 4.0
-            startPos = [xPos[0], yPos[0]]
-
-            for i in range (itr):
-                currSeg = i * pitch * unitDir + startPos
-                currLoc = currSeg
-                for j in range(4):
-                    nextLoc = np.add(np.multiply(increment, unitDir), np.multiply(math.pow(-1, j) * (width / 2), orthUnitDir))
-                    nextLoc = np.add(currLoc, nextLoc)
-                    toPlotX = [currLoc[0], nextLoc[0]]
-                    toPlotY = [currLoc[1], nextLoc[1]]
-                    currLoc = nextLoc
-                    plt.plot(toPlotX, toPlotY, 'k-')
-                     
-                #print("new Pattern")
-            print(direction)
+            increment = pitch / 4.0
+            currPos = [xPos[0], yPos[0]]
+            nextPos = [-1, -1]
+            overLength = 0
+            currLength = 0
+            counter = 0
+            patternDir = 1
+            
+            while (overLength != 1):
+                
+                if (currLength + increment >= length):
+                    overLength = 1
+                    nextPos = [xPos[1], yPos[1]]
+                   
+                    
+                else:
+                    rmd = counter % 4
+                    
+                    if (rmd == 0 or rmd == 3):
+                        patternDir = 1
+                    else:
+                        patternDir = -1
+                        
+                    nextPos = np.add(currPos, np.multiply(unitDir, increment))
+                    nextPos = np.add(nextPos, np.multiply(patternDir * width / 2.0, orthUnitDir))
+                toPlotCurr = [currPos[0], nextPos[0]]
+                toPlotNext = [currPos[1], nextPos[1]]
+                plt.plot(toPlotCurr, toPlotNext, 'k-')
+                currPos = nextPos
+                counter += 1
+                currLength += increment
+            
         
     elif lineType == 2:
         patternType = lineSegment[6]
