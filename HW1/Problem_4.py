@@ -15,6 +15,9 @@ baseWidth = 150
 baseLength = 192
 fig = plt.figure()
 ax = Axes3D(fig)
+ax.set_xlim(-500, 500)
+ax.set_ylim(-500, 500)
+ax.set_zlim(0, 1000)
 joint1Limit = np.deg2rad(155) / np.pi
 joint2Limit = np.deg2rad(145) / np.pi
 
@@ -178,10 +181,10 @@ def handelPlot(operationPos):
                          [0],
                          [1]])
     theta3 = -operationPos[-1] * np.pi
-    handTrans = np.matrix([[1, 0, 0, 0],
-                           [0, np.cos(theta3), -np.sin(theta3), 0],
-                           [0, np.sin(theta3), np.cos(theta3), 0],
-                           [0, 0, 0, 1]])
+    handTrans = np.matrix([[np.cos(theta3), -np.sin(theta3), 0, 0],
+                            [np.sin(theta3), np.cos(theta3), 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, 1]])
     handTrans = np.matmul(joint3Trans, handTrans)
     handOrt  = np.matmul(handTrans, handVect)
     finalPos = [handOrt.item((0,0)),handOrt.item((1,0)),handOrt.item((2,0))]
