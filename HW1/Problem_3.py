@@ -5,6 +5,7 @@ Created on Jan 17, 2019
 '''
 import matplotlib.pyplot as plt
 import numpy as np
+from logging import StringTemplateStyle
 
 
 def readText(fileName):
@@ -23,8 +24,13 @@ def readText(fileName):
 
     return toReturn
 
+def saveToText(toSaveStrings, fileName):
+    file = open(fileName, 'w')
+    file.write(toSaveStrings)
+    file.close()
+
 def patternPlot(lineSegment):
-    
+    toReturn = ""
     lineType    = lineSegment[0]
     patternType = lineSegment[5]
     
@@ -33,7 +39,10 @@ def patternPlot(lineSegment):
         xPos = [lineSegment[1], lineSegment[3]]
         yPos = [lineSegment[2], lineSegment[4]]
         if patternType == 1: 
+            currString = "1, %f, %f, %f, %f, 1, 0, 0 \n" % (xPos[0], yPos[0], xPos[1], yPos[1])
+            toReturn = toReturn + currString
             plt.plot(xPos, yPos, 'k-')
+            
         
         elif patternType == 3:
             width = lineSegment[6]
@@ -69,6 +78,7 @@ def patternPlot(lineSegment):
                     nextPos = np.add(nextPos, np.multiply(patternDir * width / 2.0, orthUnitDir))
                 toPlotCurr = [currPos[0], nextPos[0]]
                 toPlotNext = [currPos[1], nextPos[1]]
+                toReturn += "1, %f, %f, %f, %f, 1, 0, 0 \n" % (toPlotCurr[0], toPlotNext[0], toPlotCurr[1], toPlotNext[1])
                 plt.plot(toPlotCurr, toPlotNext, 'k-')
                 currPos = nextPos
                 counter += 1
@@ -93,6 +103,7 @@ def patternPlot(lineSegment):
                 y2 = centerPos[1] + r * np.cos(np.pi * (ang + increment))
                 xPos = [x1, x2]
                 yPos = [y1, y2]
+                toReturn += "1, %f, %f, %f, %f, 1, 0, 0 \n" % (xPos[0], yPos[0], xPos[1], yPos[1])
                 plt.plot(xPos, yPos, 'k-')
                 
         elif patternType == 3:
@@ -105,7 +116,7 @@ def patternPlot(lineSegment):
             nextAng = -1
             angleSpan = theta[1] - theta[0]
             totAng = 0
-            increment = np.arcsin((width / 2) / r) / 2 / np.pi
+            increment = np.arcsin((width / 2) / r) / np.pi
             if (theta[1] < theta[0]):
                 angleSpan = 2 + angleSpan
                 
@@ -113,7 +124,7 @@ def patternPlot(lineSegment):
             counter = 0
             while(overAngle != 1):
                 
-                if (totAng + increment > angleSpan):
+                if (totAng + increment / 2 > angleSpan):
                     overAngle = 1
                     nextAng = theta[1]
                     nextPos = [np.cos(nextAng * np.pi) * r,  np.sin(nextAng * np.pi) * r]
@@ -132,6 +143,7 @@ def patternPlot(lineSegment):
                     
                 toPlotX = [currPos[0], nextPos[0]]
                 toPlotY = [currPos[1], nextPos[1]]
+                toReturn += "1, %f, %f, %f, %f, 1, 0, 0 \n" % (toPlotX[0], toPlotY[0], toPlotX[1], toPlotY[1])
                 currPos = nextPos
                    
                     
@@ -141,18 +153,21 @@ def patternPlot(lineSegment):
                 currAng = nextAng
             
         
-        
+    return toReturn
     
 def handlePlot(data):
-    
+    toReturn = ""
     l = len(data)
     
     for i in range(l):
         currData = data[i]
-        patternPlot(currData)
+        tempString = patternPlot(currData)
+        toReturn += tempString
                          
     plt.show()
+    return toReturn
     
 if __name__ == '__main__':
     textData = readText("2d-shape-2.txt")
-    handlePlot(textData)
+    stringsToSave = handlePlot(textData)
+    saveToText(stringsToSave, 'output_shape_2.txt')
