@@ -5,7 +5,7 @@ Created on Jan 17, 2019
 '''
 import matplotlib.pyplot as plt
 import numpy as np
-from logging import StringTemplateStyle
+
 
 
 def readText(fileName):
@@ -51,38 +51,38 @@ def patternPlot(lineSegment):
             length = np.linalg.norm(direction)
             unitDir = direction / length
             orthUnitDir = [-unitDir[1], unitDir[0]]
-            increment = pitch / 4.0
+            increment = pitch / 2
             currPos = [xPos[0], yPos[0]]
-            nextPos = [-1, -1]
-            overLength = 0
             currLength = 0
-            counter = 0
-            patternDir = 1
             
+            # Start Step 1
+            startIncrement = increment / 2.0
+            nextPos = np.multiply(startIncrement, unitDir)
+            nextPos = np.add(nextPos, np.multiply(orthUnitDir, width / 2.0))
+            nextPos = np.add(currPos, nextPos)
+            toPlotX = [currPos[0], nextPos[0]]
+            toPlotY = [currPos[1], nextPos[1]]
+            currString = "1, %f, %f, %f, %f, 1, 0, 0 \n" % (toPlotX[0], toPlotY[0], toPlotX[1], toPlotY[1])
+            currLength += startIncrement
+            plt.plot(toPlotX, toPlotY,'k-')
+            currPos = nextPos
+            overLength = 0
+            counter = 1
             while (overLength != 1):
                 
-                if (currLength + increment >= length):
+                if (currLength + increment > length):
                     overLength = 1
                     nextPos = [xPos[1], yPos[1]]
-                   
-                    
                 else:
-                    rmd = counter % 4
+                    nextPos = np.add(currPos, np.multiply(increment, unitDir))
+                    nextPos = np.add(nextPos, np.multiply(width * np.power(-1, counter), orthUnitDir))
                     
-                    if (rmd == 0 or rmd == 3):
-                        patternDir = 1
-                    else:
-                        patternDir = -1
-                        
-                    nextPos = np.add(currPos, np.multiply(unitDir, increment))
-                    nextPos = np.add(nextPos, np.multiply(patternDir * width / 2.0, orthUnitDir))
-                toPlotCurr = [currPos[0], nextPos[0]]
-                toPlotNext = [currPos[1], nextPos[1]]
-                toReturn += "1, %f, %f, %f, %f, 1, 0, 0 \n" % (toPlotCurr[0], toPlotNext[0], toPlotCurr[1], toPlotNext[1])
-                plt.plot(toPlotCurr, toPlotNext, 'k-')
-                currPos = nextPos
+                toPlotX = [currPos[0], nextPos[0]]
+                toPlotY = [currPos[1], nextPos[1]]
                 counter += 1
+                currPos = nextPos
                 currLength += increment
+                plt.plot(toPlotX, toPlotY, 'k-')
             
         
     elif lineType == 2:
@@ -112,45 +112,57 @@ def patternPlot(lineSegment):
             currAng = theta[0]
             currPos = [np.cos(currAng * np.pi) * r, np.sin(currAng * np.pi) * r]
             currPos = np.add(currPos, centerPos)
-            nextPos = [-1, -1]
-            nextAng = -1
-            angleSpan = theta[1] - theta[0]
-            totAng = 0
-            increment = np.arcsin((width / 2) / r) / np.pi
-            if (theta[1] < theta[0]):
-                angleSpan = 2 + angleSpan
+            increment = np.arcsin((pitch / 2) / r)  / np.pi
+            angleRange = np.abs(lineSegment[4] - lineSegment[5])
+            
                 
+            
+            startIncrement = increment / 2
+            currAng += startIncrement
+            nextPos = [np.cos(currAng * np.pi) * r, np.sin(currAng * np.pi) * r]
+            orthUnitDir = np.divide(nextPos, np.linalg.norm(nextPos))
+            nextPos = np.add(nextPos, centerPos)
+            posChange = np.multiply(width / 2.0, orthUnitDir)
+            nextPos = np.add(nextPos, posChange)
+            toPlotX = [currPos[0], nextPos[0]]
+            toPlotY = [currPos[1], nextPos[1]]
+            currString = "1, %f, %f, %f, %f, 1, 0, 0 \n" % (toPlotX[0], toPlotY[0], toPlotX[1], toPlotY[1])
+            plt.plot(toPlotX, toPlotY, 'k-')
+            toReturn += currString
+            currAngleSpan = startIncrement
             overAngle = 0
-            counter = 0
-            while(overAngle != 1):
+            counter = 1
+            currPos = nextPos
+            
+            while (overAngle != 1):
                 
-                if (totAng + increment / 2 > angleSpan):
+                if (currAngleSpan + increment > angleRange):
                     overAngle = 1
-                    nextAng = theta[1]
-                    nextPos = [np.cos(nextAng * np.pi) * r,  np.sin(nextAng * np.pi) * r]
+                    currAng = theta[1]
+                    nextPos = [np.cos(currAng * np.pi) * r, np.sin(currAng * np.pi) * r]
                     nextPos = np.add(nextPos, centerPos)
                 else:
-                    nextAng = currAng + increment
-                    nextPos = [np.cos(nextAng * np.pi) * r,  np.sin(nextAng * np.pi) * r]
+                    currAng += increment
+                    nextPos = [np.cos(currAng * np.pi) * r, np.sin(currAng * np.pi) * r]
+                    orthUnitDir = np.divide(nextPos, np.linalg.norm(nextPos))
                     nextPos = np.add(nextPos, centerPos)
-                    orthDir = np.subtract(nextPos, centerPos)
-                    unitOrthDir = orthDir / np.linalg.norm(orthDir)   
-                         
-                    if (counter % 4 == 2):
-                        nextPos = np.add(nextPos, unitOrthDir * width / 2)
-                    elif(counter % 4 == 0):
-                        nextPos = np.subtract(nextPos, unitOrthDir * width / 2)
-                    
+                    posChange = np.multiply(np.power(-1, counter), orthUnitDir)
+                    posChange = np.multiply(posChange, width / 2.0)
+                    nextPos = np.add(nextPos, posChange)
+                
                 toPlotX = [currPos[0], nextPos[0]]
                 toPlotY = [currPos[1], nextPos[1]]
-                toReturn += "1, %f, %f, %f, %f, 1, 0, 0 \n" % (toPlotX[0], toPlotY[0], toPlotX[1], toPlotY[1])
-                currPos = nextPos
-                   
-                    
+                currString = "1, %f, %f, %f, %f, 1, 0, 0 \n" % (toPlotX[0], toPlotY[0], toPlotX[1], toPlotY[1])
                 plt.plot(toPlotX, toPlotY, 'k-')
+                toReturn += currString 
                 counter += 1
-                totAng += increment
-                currAng = nextAng
+                currPos = nextPos
+                currAngleSpan += increment
+                    
+                    
+            
+            
+            
             
         
     return toReturn
@@ -168,6 +180,6 @@ def handlePlot(data):
     return toReturn
     
 if __name__ == '__main__':
-    textData = readText("2d-shape-2.txt")
+    textData = readText("2d-shape-1.txt")
     stringsToSave = handlePlot(textData)
-    saveToText(stringsToSave, 'output_shape_2.txt')
+    saveToText(stringsToSave, 'output_shape_1.txt')
