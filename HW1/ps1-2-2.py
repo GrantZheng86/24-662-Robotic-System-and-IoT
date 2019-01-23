@@ -180,6 +180,6 @@ def handlePlot(data):
     return toReturn
     
 if __name__ == '__main__':
-    textData = readText("2d-shape-1.txt")
+    textData = readText("2d-shape-2.txt")
     stringsToSave = handlePlot(textData)
-    saveToText(stringsToSave, 'output_shape_1.txt')
+    saveToText(stringsToSave, '2d-shape-2-output.txt')
