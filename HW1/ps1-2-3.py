@@ -40,13 +40,16 @@ def handleUI():
     toReturn = list(map(float, toReturn))
     theta1 = toReturn[0]
     theta2 = toReturn[1]
-    
+
     if np.abs(theta1) > joint1Limit:
         raise ValueError('Joint 1 angle out of range, enter value between %f and %f' % (-joint1Limit, joint1Limit))
     elif np.abs(theta2) > joint2Limit:
         raise ValueError('Joint 2 angle out of range, enter value between %f and %f' % (-joint2Limit, joint2Limit))
     elif len(toReturn) != 4:
         raise IndexError('Enter 4 numbers, separate by comma')
+    elif toReturn[3] < 0 or toReturn[3] > 200:
+        raise ValueError('Tool hand movement out of range, enter a number between 0 and 200')
+
     return toReturn
 
 def plotRectangle(corners):

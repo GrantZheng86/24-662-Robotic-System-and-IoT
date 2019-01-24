@@ -1,0 +1,1 @@
+In order to have a output image, the error checking must be disables first. Both the theta 1 and z axis movement is out of range. The program will promp error message and stop. Error messages are shown in output-23-error.png
