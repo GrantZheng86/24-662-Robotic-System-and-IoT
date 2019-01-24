@@ -1,0 +1,1 @@
+This python file requires python 3 to compile, python 2 will not import the tkinter package in the code
